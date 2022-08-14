@@ -37,7 +37,7 @@ OLD="${TEMP:1}0";
 umount /proc/meminfo 2> /dev/null
 sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
 mount --bind /etc/fake_meminfo /proc/meminfo
-echo -e "${Green}swap创建成功，并查看信息：${Font}"
+echo -e "${Green}swap删除成功，并查看信息：${Font}"
 free -m
 }
 
