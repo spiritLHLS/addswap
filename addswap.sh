@@ -32,6 +32,12 @@ if [ $VIRT = "openvz" ]; then
     umount /proc/meminfo 2> /dev/null
     sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
     mount --bind /etc/fake_meminfo /proc/meminfo
+    if [ ! -d "/etc/addswap.conf.d" ]; then
+      mkdir /etc/addswap.conf.d/
+    fi
+    rm -rf /etc/addswap.conf.d/swap.txt
+    echo "$SWAP" >> /etc/addswap.conf.d/swap.txt
+    [ -e /etc/crontab ] && sed -i "-C/d" /etc/crontab && echo "@reboot root /usr/bin/addswap.sh /$SWAP -C" >> /etc/crontab
     echo -e "${Green}swap创建成功，并查看信息：${Font}"
     free -m
 else
@@ -65,6 +71,12 @@ if [ $VIRT = "openvz" ]; then
     umount /proc/meminfo 2> /dev/null
     sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
     mount --bind /etc/fake_meminfo /proc/meminfo
+    if [ ! -d "/etc/addswap.conf.d" ]; then
+      mkdir /etc/addswap.conf.d/
+    fi
+    rm -rf /etc/addswap.conf.d/swap.txt
+    echo "0" >> /etc/addswap.conf.d/swap.txt
+    [ -e /etc/crontab ] && sed -i "-C/d" /etc/crontab 
     echo -e "${Green}swap删除成功，并查看信息：${Font}"
     free -m
 else
@@ -111,4 +123,26 @@ case "$num" in
     ;;
     esac
 }
+
+check_swap(){
+  check_root
+  check_virt
+  SWAP = $(cat /etc/addswap.conf.d/swap.txt)
+  if [ $VIRT = "openvz" ]; then
+    NEW="$[SWAP*1024]";
+    TEMP="${NEW//?/ }";
+    OLD="${TEMP:1}0";
+    umount /proc/meminfo 2> /dev/null
+    sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
+    mount --bind /etc/fake_meminfo /proc/meminfo
+  fi
+}
+
+
+# 传参
+while getopts "C:c:" OPTNAME; do
+  case "$OPTNAME" in
+    'C'|'c' ) check_swap;;
+  esac
+done
 main
