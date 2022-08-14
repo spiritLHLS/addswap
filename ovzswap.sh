@@ -1,11 +1,10 @@
 #!/bin/bash
 #频道：https://t.me/vps_reviews
 
-# 自定义字体彩色，read 函数，安装依赖函数
-red(){ echo -e "\033[31m\033[01m$@\033[0m"; }
-green(){ echo -e "\033[32m\033[01m$@\033[0m"; }
-yellow(){ echo -e "\033[33m\033[01m$@\033[0m"; }
-reading(){ read -rp "$(green "$1")" "$2"; }
+# 自定义字体彩色
+Green="\033[32m"
+Font="\033[0m"
+Red="\033[31m" 
 
 # 必须以root运行脚本
 check_root(){
