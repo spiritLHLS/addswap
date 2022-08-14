@@ -78,7 +78,8 @@ if [ $VIRT = "openvz" ]; then
     fi
     rm -rf /etc/addswap.conf.d/swap.txt
     echo "0" >> /etc/addswap.conf.d/swap.txt
-    [ -e /etc/crontab ] && sed -i "/$0 -C/d" /etc/crontab | echo "no swap shell in crontab"
+    sed -i "/$0/d" /etc/crontab | echo "no swap shell in crontab"
+     grep -q "$0 -C" /etc/crontab && sed -i "/$0 -C/d" /etc/crontab | echo "no swap shell in crontab"
     echo -e "${Green}swap删除成功，并查看信息：${Font}"
     free -m
 else
