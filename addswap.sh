@@ -33,11 +33,6 @@ if [ $VIRT = "openvz" ]; then
     umount /proc/meminfo 2> /dev/null
     sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
     mount --bind /etc/fake_meminfo /proc/meminfo
-    if [ ! -d "/etc/addswap.conf.d" ]; then
-      mkdir /etc/addswap.conf.d/
-    fi
-    rm -rf /etc/addswap.conf.d/swap.txt
-    echo "$SWAP" >> /etc/addswap.conf.d/swap.txt
     sed -i "/$0/d" /etc/crontab | echo "no swap shell in crontab"
     grep -q "$0 -C" /etc/crontab && sed -i "/$0 -C/d" /etc/crontab | echo "no swap shell in crontab"
     [ -e /etc/crontab ] && sed -i "/$0 -C/d" /etc/crontab && 
@@ -75,11 +70,6 @@ if [ $VIRT = "openvz" ]; then
     umount /proc/meminfo 2> /dev/null
     sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
     mount --bind /etc/fake_meminfo /proc/meminfo
-    if [ ! -d "/etc/addswap.conf.d" ]; then
-      mkdir /etc/addswap.conf.d/
-    fi
-    rm -rf /etc/addswap.conf.d/swap.txt
-    echo "0" >> /etc/addswap.conf.d/swap.txt
     sed -i "/$0/d" /etc/crontab | echo "no swap shell in crontab"
     grep -q "$0 -C" /etc/crontab && sed -i "/$0 -C/d" /etc/crontab | echo "no swap shell in crontab"
     echo -e "${Green}swap删除成功，并查看信息：${Font}"
