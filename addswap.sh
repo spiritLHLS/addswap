@@ -130,13 +130,16 @@ check_swap(){
     sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
     mount --bind /etc/fake_meminfo /proc/meminfo
   fi
+  sleep 1
+  exit 1
 }
 
 
 # 传参
 while getopts "C:c:" OPTNAME; do
   case "$OPTNAME" in
-    'C'|'c' ) check_swap; SWAP=$OPTARG;;
+    'C'|'c' ) SWAP=$OPTARG;CHOOSE_MODE=1;;
   esac
 done
+[ $CHOOSE_MODE = 1 ] && (check_swap)
 main
