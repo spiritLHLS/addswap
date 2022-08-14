@@ -25,7 +25,7 @@ add_swap(){
 echo -e "${Green}请输入需要添加的swap，建议为内存的2倍！${Font}"
 read -p "请输入swap数值:" SWAP
 echo 'Start adding SWAP space ......';
-if [ $VIRT = 'openvz' ]; then
+if [ $VIRT = "openvz" ]; then
     NEW="$[SWAP*1024]";
     TEMP="${NEW//?/ }";
     OLD="${TEMP:1}0";
@@ -56,7 +56,7 @@ fi
 }
 
 del_swap(){
-if [ $VIRT = 'openvz' ]; then
+if [ $VIRT = "openvz" ]; then
     echo 'Start deleting SWAP space ......';
     SWAP=0;
     NEW="$[SWAP*1024]";
@@ -87,8 +87,8 @@ fi
 
 #开始菜单
 main(){
-root_need
-ovz_no
+check_root
+check_virt
 clear
 echo -e "———————————————————————————————————————"
 echo -e "${Green}Linux VPS一键添加/删除swap脚本${Font}"
