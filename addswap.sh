@@ -41,7 +41,7 @@ if [ $VIRT = "openvz" ]; then
     sed -i "/$0/d" /etc/crontab | echo "no swap shell in crontab"
     grep -q "$0 -C" /etc/crontab && sed -i "/$0 -C/d" /etc/crontab | echo "no swap shell in crontab"
     [ -e /etc/crontab ] && sed -i "/$0 -C/d" /etc/crontab && 
-    echo "@reboot root bash $HOME/$0 $SWAP -C" >> /etc/crontab
+    echo "@reboot root bash $HOME/$0 -C $SWAP" >> /etc/crontab
     echo -e "${Green}swap创建成功，并查看信息：${Font}"
     free -m
 else
@@ -132,7 +132,6 @@ case "$num" in
 check_swap(){
   check_root
   check_virt
-  SWAP = $1
   if [ $VIRT = "openvz" ]; then
     NEW="$[SWAP*1024]";
     TEMP="${NEW//?/ }";
@@ -147,7 +146,7 @@ check_swap(){
 # 传参
 while getopts "C:c:" OPTNAME; do
   case "$OPTNAME" in
-    'C'|'c' ) check_swap;;
+    'C'|'c' ) check_swap;SWAP=$OPTARG;;
   esac
 done
 main
