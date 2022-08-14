@@ -25,6 +25,9 @@ umount /proc/meminfo 2> /dev/null
 sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
 mount --bind /etc/fake_meminfo /proc/meminfo
 echo 'Add the ready!';
+echo -e "${Green}swap创建成功，并查看信息：${Font}"
+cat /proc/swaps
+cat /proc/meminfo | grep Swap
 }
 
 del_swap(){
@@ -37,6 +40,9 @@ umount /proc/meminfo 2> /dev/null
 sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
 mount --bind /etc/fake_meminfo /proc/meminfo
 echo 'Add the ready!';
+echo -e "${Green}swap创建成功，并查看信息：${Font}"
+cat /proc/swaps
+cat /proc/meminfo | grep Swap
 }
 
 #开始菜单
