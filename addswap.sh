@@ -132,7 +132,7 @@ case "$num" in
 check_swap(){
   check_root
   check_virt
-  SWAP = $(cat /etc/addswap.conf.d/swap.txt)
+  SWAP = $1
   if [ $VIRT = "openvz" ]; then
     NEW="$[SWAP*1024]";
     TEMP="${NEW//?/ }";
