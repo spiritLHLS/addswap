@@ -141,5 +141,5 @@ while getopts ":C:c:" OPTNAME; do
     'C'|'c' ) SWAP=$OPTARG;CHOOSE_MODE=1;;
   esac
 done
-[ $CHOOSE_MODE = 1 ] && (check_swap)
+[ $CHOOSE_MODE = 1 ] && check_swap
 main
