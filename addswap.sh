@@ -1,6 +1,6 @@
 #!/bin/bash
 #频道：https://t.me/vps_reviews
-#版本：2022.08.15
+#版本：2022.08.16
 
 # 自定义字体彩色
 Green="\033[32m"
@@ -136,7 +136,7 @@ check_swap(){
 
 
 # 传参
-while getopts "C:c:" OPTNAME; do
+while getopts ":C:c:" OPTNAME; do
   case "$OPTNAME" in
     'C'|'c' ) SWAP=$OPTARG;CHOOSE_MODE=1;;
   esac
