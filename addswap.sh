@@ -36,7 +36,7 @@ if [ $VIRT = "openvz" ]; then
     sed -i "/$0/d" /etc/crontab | echo "no swap shell in crontab"
     grep -q "$0 -C" /etc/crontab && sed -i "/$0 -C/d" /etc/crontab | echo "no swap shell in crontab"
     [ -e /etc/crontab ] && sed -i "/$0 -C/d" /etc/crontab && 
-    echo "@reboot root nohup bash $HOME/$0 -C $SWAP >> /root/log 2>&1 &" >> /etc/crontab
+    echo "@reboot root bash $HOME/$0 -C $SWAP" >> /etc/crontab
     echo -e "${Green}swap创建成功，并查看信息：${Font}"
     free -m
 else
