@@ -7,7 +7,7 @@ sudo -i
 curl -L https://raw.githubusercontent.com/spiritLHLS/addswap/main/addswap.sh -o addswap.sh && chmod +x addswap.sh && bash addswap.sh 
 ```
 
-已增加openvz架构重启swap自动添加的，务必要在root根目录运行此脚本并保证脚本一直在root根目录下。
+已增加openvz架构重启swap自动添加的，务必要在root根目录运行此脚本并保证脚本一直在root下(也即sudo -i后的路径下)。
 
 (有bug未修复，重启时swap自动删除了)
 
