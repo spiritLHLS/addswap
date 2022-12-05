@@ -9,7 +9,7 @@ curl -L https://raw.githubusercontent.com/spiritLHLS/addswap/main/addswap.sh -o 
 
 已增加openvz架构重启swap自动添加的，务必要在root根目录运行此脚本并保证脚本一直在root下(也即sudo -i后的路径下)。
 
-(有bug未修复，重启时swap自动删除了)
+openvz这个添加=掩耳盗铃，实际受到虚拟化限制应该是无法添加的，只能由虚拟化主机控制
 
 ### 单位换算：输入 1024 产生 1G SWAP内存
 
