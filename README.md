@@ -11,6 +11,8 @@ curl -L https://raw.githubusercontent.com/spiritLHLS/addswap/main/addswap.sh -o 
 
 openvz这个添加=掩耳盗铃，实际受到虚拟化限制应该是无法添加的，只能由虚拟化主机控制
 
+因此，该项目不再更新，除非另有需求
+
 ### 单位换算：输入 1024 产生 1G SWAP内存
 
 # 致谢
