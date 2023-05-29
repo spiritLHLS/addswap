@@ -1,6 +1,6 @@
 #!/bin/bash
 #频道：https://t.me/vps_reviews
-#版本：2022.08.16
+#版本：2023.05.29
 
 utf8_locale=$(locale -a 2>/dev/null | grep -i -m 1 -E "UTF-8|utf8")
 if [[ -z "$utf8_locale" ]]; then
