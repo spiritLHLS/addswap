@@ -16,6 +16,10 @@ fi
 Green="\033[32m"
 Font="\033[0m"
 Red="\033[31m" 
+SCRIPT="addswap.sh"
+DEST_DIR="/tmp"
+CRON_FILE="/etc/crontab"
+CRON_ENTRY="@reboot root $DEST_DIR/$SCRIPT -C \$SWAP"
 
 # 必须以root运行脚本
 check_root(){
@@ -32,6 +36,12 @@ check_virt(){
   esac
 }
 
+delete_cron_entry() {
+    if grep -q "$1" "$CRON_FILE"; then
+        sed -i "\|$1|d" "$CRON_FILE"
+    fi
+}
+
 add_swap(){
 echo -e "${Green}请输入需要添加的swap，建议为内存的2倍！${Font}"
 read -p "请输入swap数值:" SWAP
@@ -45,12 +55,9 @@ if [ $VIRT = "openvz" ]; then
     mount --bind /etc/fake_meminfo /proc/meminfo
     sed -i "/$0/d" /etc/crontab | echo "no swap shell in crontab"
     grep -q "$0 -C" /etc/crontab && sed -i "/$0 -C/d" /etc/crontab | echo "no swap shell in crontab"
-    SCRIPT="addswap.sh"
-    DEST_DIR="/tmp"
-    CRON_FILE="/etc/crontab"
-    CRON_ENTRY="@reboot root $DEST_DIR/$SCRIPT -C \$SWAP"
     cp "$SCRIPT" "$DEST_DIR/$SCRIPT"
-    [ -e /etc/crontab ] && sed -i "/$0 -C/d" /etc/crontab && 
+    delete_cron_entry "$0"
+    delete_cron_entry "$DEST_DIR/$SCRIPT -C"
     echo "$CRON_ENTRY" >> "$CRON_FILE"
     echo -e "${Green}swap创建成功，并查看信息：${Font}"
     free -m
@@ -84,8 +91,8 @@ if [ $VIRT = "openvz" ]; then
     umount /proc/meminfo 2> /dev/null
     sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
     mount --bind /etc/fake_meminfo /proc/meminfo
-    sed -i "/$0/d" /etc/crontab | echo "no swap shell in crontab"
-    grep -q "$0 -C" /etc/crontab && sed -i "/$0 -C/d" /etc/crontab | echo "no swap shell in crontab"
+    delete_cron_entry "$0"
+    delete_cron_entry "$DEST_DIR/$SCRIPT -C"
     echo -e "${Green}swap删除成功，并查看信息：${Font}"
     free -m
 else
