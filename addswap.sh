@@ -52,11 +52,10 @@ if [ $VIRT = "openvz" ]; then
 else
     #检查是否存在swapfile
     grep -q "swapfile" /etc/fstab
-    
     #如果不存在将为其创建swap
     if [ $? -ne 0 ]; then
         echo -e "${Green}swapfile未发现，正在为其创建swapfile${Font}"
-        fallocate -l ${swapsize}M /swapfile
+        fallocate -l ${SWAP}M /swapfile
         chmod 600 /swapfile
         mkswap /swapfile
         swapon /swapfile
