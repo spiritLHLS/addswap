@@ -45,8 +45,13 @@ if [ $VIRT = "openvz" ]; then
     mount --bind /etc/fake_meminfo /proc/meminfo
     sed -i "/$0/d" /etc/crontab | echo "no swap shell in crontab"
     grep -q "$0 -C" /etc/crontab && sed -i "/$0 -C/d" /etc/crontab | echo "no swap shell in crontab"
+    SCRIPT="addswap.sh"
+    DEST_DIR="/tmp"
+    CRON_FILE="/etc/crontab"
+    CRON_ENTRY="@reboot root $DEST_DIR/$SCRIPT -C \$SWAP"
+    cp "$SCRIPT" "$DEST_DIR/$SCRIPT"
     [ -e /etc/crontab ] && sed -i "/$0 -C/d" /etc/crontab && 
-    echo "@reboot root bash $HOME/$0 -C $SWAP" >> /etc/crontab
+    echo "$CRON_ENTRY" >> "$CRON_FILE"
     echo -e "${Green}swap创建成功，并查看信息：${Font}"
     free -m
 else
