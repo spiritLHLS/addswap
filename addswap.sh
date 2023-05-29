@@ -54,7 +54,6 @@ if [ $VIRT = "openvz" ]; then
     sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo > /etc/fake_meminfo
     mount --bind /etc/fake_meminfo /proc/meminfo
     sed -i "/$0/d" /etc/crontab | echo "no swap shell in crontab"
-    grep -q "$0 -C" /etc/crontab && sed -i "/$0 -C/d" /etc/crontab | echo "no swap shell in crontab"
     cp "$SCRIPT" "$DEST_DIR/$SCRIPT"
     delete_cron_entry "$0"
     delete_cron_entry "$DEST_DIR/$SCRIPT -C"
