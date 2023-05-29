@@ -1,14 +1,14 @@
 # addswap
 
-更新时间：2022.12.05
+更新时间：2023.05.29
 
-为openvz或kvm架构的linux服务器增加swap分区，请确保在/root路径下使用
+为openvz或kvm架构的linux服务器增加swap分区
 
 ```bash
 curl -L https://raw.githubusercontent.com/spiritLHLS/addswap/main/addswap.sh -o addswap.sh && chmod +x addswap.sh && bash addswap.sh
 ```
 
-已增加openvz架构重启swap自动添加的，务必要在root根目录运行此脚本并保证脚本一直在root下(也即sudo -i后的路径下)。
+已增加openvz架构重启swap自动添加的
 
 openvz这个添加=掩耳盗铃，实际受到虚拟化限制应该是无法添加的，只能由虚拟化主机控制
 
