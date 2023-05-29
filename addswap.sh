@@ -19,7 +19,6 @@ Red="\033[31m"
 SCRIPT="addswap.sh"
 DEST_DIR="/tmp"
 CRON_FILE="/etc/crontab"
-CRON_ENTRY="@reboot root $DEST_DIR/$SCRIPT -C \$SWAP"
 
 # 必须以root运行脚本
 check_root(){
@@ -45,6 +44,7 @@ delete_cron_entry() {
 add_swap(){
 echo -e "${Green}请输入需要添加的swap，建议为内存的2倍！${Font}"
 read -p "请输入swap数值:" SWAP
+CRON_ENTRY="@reboot root $DEST_DIR/$SCRIPT -C $SWAP"
 echo 'Start adding SWAP space ......';
 if [ $VIRT = "openvz" ]; then
     NEW="$[SWAP*1024]";
