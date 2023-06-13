@@ -117,6 +117,7 @@ main(){
 check_root
 check_virt
 clear
+free -m
 echo -e "———————————————————————————————————————"
 echo -e "${Green}Linux VPS一键添加/删除swap脚本${Font}"
 echo -e "${Green}1、添加swap${Font}"
