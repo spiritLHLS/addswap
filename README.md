@@ -2,7 +2,7 @@
 
 更新时间：2023.05.29
 
-为openvz或kvm架构的linux服务器增加swap分区(虚拟内存)
+为openvz、kvm虚拟化的linux服务器增加swap分区(虚拟内存)
 
 ```bash
 curl -L https://raw.githubusercontent.com/spiritLHLS/addswap/main/addswap.sh -o addswap.sh && chmod +x addswap.sh && bash addswap.sh
