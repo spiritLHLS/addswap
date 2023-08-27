@@ -24,6 +24,8 @@ kvm分区原版脚本源自 https://www.moerats.com/
 curl -L https://www.moerats.com/usr/shell/swap.sh -o swap.sh && chmod +x swap.sh && bash swap.sh
 ```
 
-openVZ分区原版脚本源自 http://linux-problem-solver.blogspot.com/2013/08/create-fake-swap-in-openvz-vps-if-you-get-swapon-failed-operation-not-permitted-error.html
+openVZ分区原版脚本源自 
 
-由 @fscarmen 指导修改优化
+http://linux-problem-solver.blogspot.com/2013/08/create-fake-swap-in-openvz-vps-if-you-get-swapon-failed-operation-not-permitted-error.html
+
+感谢 [@fscarmen](https://github.com/fscarmen) 提供优化建议
