@@ -1,6 +1,7 @@
 #!/bin/bash
-#频道：https://t.me/vps_reviews
-#版本：2023.05.29
+#From https://github.com/spiritLHLS/addswap
+#Channel: https://t.me/vps_reviews
+#2023.05.29
 
 utf8_locale=$(locale -a 2>/dev/null | grep -i -m 1 -E "UTF-8|utf8")
 if [[ -z "$utf8_locale" ]]; then
