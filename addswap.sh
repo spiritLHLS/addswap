@@ -1,7 +1,7 @@
 #!/bin/bash
 #From https://github.com/spiritLHLS/addswap
 #Channel: https://t.me/vps_reviews
-#2023.05.29
+#2023.08.27
 
 utf8_locale=$(locale -a 2>/dev/null | grep -i -m 1 -E "UTF-8|utf8")
 if [[ -z "$utf8_locale" ]]; then
@@ -13,17 +13,22 @@ else
   echo "Locale set to $utf8_locale"
 fi
 
-# 自定义字体彩色
+# 自定义字体彩色和其他配置
 Green="\033[32m"
 Font="\033[0m"
 Red="\033[31m"
+_red() { echo -e "\033[31m\033[01m$@\033[0m"; }
+_green() { echo -e "\033[32m\033[01m$@\033[0m"; }
+_yellow() { echo -e "\033[33m\033[01m$@\033[0m"; }
+_blue() { echo -e "\033[36m\033[01m$@\033[0m"; }
+reading() { read -rp "$(_green "$1")" "$2"; }
 SCRIPT="addswap.sh"
 DEST_DIR="/tmp"
 CRON_FILE="/etc/crontab"
 
 # 必须以root运行脚本
 check_root() {
-  [[ $(id -u) != 0 ]] && red " The script must be run as root, you can enter sudo -i and then download and run again." && exit 1
+  [[ $(id -u) != 0 ]] && _red " The script must be run as root, you can enter sudo -i and then download and run again." && exit 1
 }
 
 #检查架构
@@ -43,8 +48,14 @@ delete_cron_entry() {
 }
 
 add_swap() {
-  echo -e "${Green}请输入需要添加的swap，建议为内存的2倍！${Font}"
-  read -p "请输入swap数值:" SWAP
+  _green "Please enter the desired amount of swap to add, recommended to be twice the size of the memory!"
+  _green "请输入需要添加的swap，建议为内存的2倍！"
+  _green "Please enter the swap value in megabytes (MB) (leave blank and press Enter for default, which is twice the memory):"
+  reading "请输入swap数值，以MB计算(留空回车则默认为内存的2倍):" SWAP
+  if [ -z "$SWAP" ]; then
+    total_memory=$(free -m | awk '/^Mem:/{print $2}')
+    SWAP=$((total_memory * 2))
+  fi
   CRON_ENTRY="@reboot root $DEST_DIR/$SCRIPT -C $SWAP"
   echo 'Start adding SWAP space ......'
   if [ $VIRT = "openvz" ]; then
@@ -59,24 +70,28 @@ add_swap() {
     delete_cron_entry "$0"
     delete_cron_entry "$DEST_DIR/$SCRIPT -C"
     echo "$CRON_ENTRY" >>"$CRON_FILE"
-    echo -e "${Green}swap创建成功，并查看信息：${Font}"
+    _green "swap creation successful, and view the information:"
+    _green "swap创建成功，并查看信息："
     free -m
   else
     #检查是否存在swapfile
     grep -q "swapfile" /etc/fstab
     #如果不存在将为其创建swap
     if [ $? -ne 0 ]; then
-      echo -e "${Green}swapfile未发现，正在为其创建swapfile${Font}"
+      _green "Swapfile not found, creating a swapfile for it."
+      _green "swapfile未发现，正在为其创建swapfile"
       fallocate -l ${SWAP}M /swapfile
       chmod 600 /swapfile
       mkswap /swapfile
       swapon /swapfile
       echo '/swapfile none swap defaults 0 0' >>/etc/fstab
-      echo -e "${Green}swap创建成功，并查看信息：${Font}"
+      _green "swap creation successful, and view the information:"
+      _green "swap创建成功，并查看信息："
       cat /proc/swaps
       cat /proc/meminfo | grep Swap
     else
-      echo -e "${Red}swapfile已存在，swap设置失败，请先运行脚本删除swap后重新设置！${Font}"
+      _red "swapfile already exists, swap configuration failed. Please run the script to remove the existing swap and then reconfigure."
+      _red "swapfile已存在，swap设置失败，请先运行脚本删除swap后重新设置！"
     fi
   fi
 }
@@ -93,7 +108,8 @@ del_swap() {
     mount --bind /etc/fake_meminfo /proc/meminfo
     delete_cron_entry "$0"
     delete_cron_entry "$DEST_DIR/$SCRIPT -C"
-    echo -e "${Green}swap删除成功，并查看信息：${Font}"
+    _green "Swap deletion successful, and view information:"
+    _green "swap删除成功，并查看信息："
     free -m
   else
     #检查是否存在swapfile
@@ -101,14 +117,17 @@ del_swap() {
 
     #如果存在就将其移除
     if [ $? -eq 0 ]; then
-      echo -e "${Green}swapfile已发现，正在将其移除...${Font}"
+      _green "swapfile has been detected, and it is being removed..."
+      _green "swapfile已发现，正在将其移除..."
       sed -i '/swapfile/d' /etc/fstab
       echo "3" >/proc/sys/vm/drop_caches
       swapoff -a
       rm -f /swapfile
-      echo -e "${Green}swap已删除！${Font}"
+      _green "swap has been deleted!"
+      _green "swap已删除！"
     else
-      echo -e "${Red}swapfile未发现，swap删除失败！${Font}"
+      _red "swapfile not found, failed to delete swap!"
+      _red "swapfile未发现，swap删除失败！"
     fi
   fi
 }
@@ -119,26 +138,28 @@ main() {
   check_virt
   clear
   free -m
-  echo -e "———————————————————————————————————————"
-  echo -e "${Green}Linux VPS一键添加/删除swap脚本${Font}"
-  echo -e "${Green}1、添加swap${Font}"
-  echo -e "${Green}2、删除swap${Font}"
-  echo -e "———————————————————————————————————————"
-  read -p "请输入数字 [1-2]:" num
-  case "$num" in
-  1)
-    add_swap
-    ;;
-  2)
-    del_swap
-    ;;
-  *)
-    clear
-    echo -e "${Green}请输入正确数字 [1-2]${Font}"
-    sleep 2s
-    main
-    ;;
-  esac
+  echo -e "—————————————————————————————————————————————————————————————"
+  _green "Linux VPS one click add/remove swap script ${Font}"
+  _green "1, Add swap${Font}"
+  _green "2, Remove swap${Font}"
+  echo -e "—————————————————————————————————————————————————————————————"
+  while true; do
+    _green "Please enter a number"
+    reading "请输入数字 [1-2]:" num
+    case "$num" in
+    1)
+      add_swap
+      break
+      ;;
+    2)
+      del_swap
+      break
+      ;;
+    *)
+      echo "输入错误，请重新输入"
+      ;;
+    esac
+  done
 }
 
 check_swap() {
@@ -156,14 +177,4 @@ check_swap() {
   exit 1
 }
 
-# 传参
-while getopts ":C:c:" OPTNAME; do
-  case "$OPTNAME" in
-  'C' | 'c')
-    SWAP=$OPTARG
-    CHOOSE_MODE=1
-    ;;
-  esac
-done
-[ $CHOOSE_MODE = 1 ] && check_swap
 main
