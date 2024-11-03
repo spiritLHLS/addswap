@@ -1,7 +1,7 @@
 #!/bin/bash
-#From https://github.com/spiritLHLS/addswap
-#Channel: https://t.me/vps_reviews
-#2023.08.27
+# From https://github.com/spiritLHLS/addswap
+# Channel: https://t.me/vps_reviews
+# 2024.11.03
 
 utf8_locale=$(locale -a 2>/dev/null | grep -i -m 1 -E "UTF-8|utf8")
 if [[ -z "$utf8_locale" ]]; then
@@ -45,6 +45,40 @@ delete_cron_entry() {
   if grep -q "$1" "$CRON_FILE"; then
     sed -i "\|$1|d" "$CRON_FILE"
   fi
+}
+
+set_swappiness() {
+  _blue "Smaller values indicate more aggressive use of physical memory, and a setting of 1 is recommended."
+  _blue "数值越小表示越积极使用物理内存，推荐设置为1。"
+  while true; do
+    _green "Please enter the desired swappiness value (1-100):"
+    _green "请输入期望的swappiness值 (1-100)："
+    reading "Swappiness value (1-100): " swappiness
+    if [[ $swappiness =~ ^[0-9]+$ ]] && [ $swappiness -ge 1 ] && [ $swappiness -le 100 ]; then
+      echo $swappiness > /proc/sys/vm/swappiness
+      _green "Swappiness is set to $swappiness."
+      _green "swappiness已设置为 $swappiness。"
+      if grep -q "^vm.swappiness=" /etc/sysctl.conf; then
+        sed -i "s/^vm.swappiness=.*/vm.swappiness=$swappiness/" /etc/sysctl.conf
+        _green "Updated vm.swappiness in /etc/sysctl.conf to $swappiness."
+      else
+        echo "vm.swappiness=$swappiness" >> /etc/sysctl.conf
+        _green "Added vm.swappiness=$swappiness to /etc/sysctl.conf."
+      fi
+      sysctl -p
+      _green "Sysctl configuration reloaded."
+      break
+    else
+      _red "Invalid input. Please enter a number between 1 and 100."
+      _red "输入无效，请输入1到100之间的数字。"
+    fi
+  done
+}
+
+check_swappiness() {
+  swappiness=$(cat /proc/sys/vm/swappiness)
+  _blue "Current swappiness value is $swappiness."
+  _blue "当前的swappiness值为 $swappiness。"
 }
 
 add_swap() {
@@ -96,56 +130,22 @@ add_swap() {
   fi
 }
 
-del_swap() {
-  if [ $VIRT = "openvz" ]; then
-    echo 'Start deleting SWAP space ......'
-    SWAP=0
-    NEW="$((SWAP * 1024))"
-    TEMP="${NEW//?/ }"
-    OLD="${TEMP:1}0"
-    umount /proc/meminfo 2>/dev/null
-    sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo >/etc/fake_meminfo
-    mount --bind /etc/fake_meminfo /proc/meminfo
-    delete_cron_entry "$0"
-    delete_cron_entry "$DEST_DIR/$SCRIPT -C"
-    _green "Swap deletion successful, and view information:"
-    _green "swap删除成功，并查看信息："
-    free -m
-  else
-    #检查是否存在swapfile
-    grep -q "swapfile" /etc/fstab
-
-    #如果存在就将其移除
-    if [ $? -eq 0 ]; then
-      _green "swapfile has been detected, and it is being removed..."
-      _green "swapfile已发现，正在将其移除..."
-      sed -i '/swapfile/d' /etc/fstab
-      echo "3" >/proc/sys/vm/drop_caches
-      swapoff -a
-      rm -f /swapfile
-      _green "swap has been deleted!"
-      _green "swap已删除！"
-    else
-      _red "swapfile not found, failed to delete swap!"
-      _red "swapfile未发现，swap删除失败！"
-    fi
-  fi
-}
-
-#开始菜单
+# 开始菜单
 main() {
   check_root
   check_virt
   clear
   free -m
+  check_swappiness
   echo -e "—————————————————————————————————————————————————————————————"
   _green "Linux VPS one click add/remove swap script ${Font}"
   _green "1, Add swap${Font}"
   _green "2, Remove swap${Font}"
+  _green "3, Set swappiness value${Font}"
   echo -e "—————————————————————————————————————————————————————————————"
   while true; do
     _green "Please enter a number"
-    reading "请输入数字 [1-2]:" num
+    reading "请输入数字 [1-3]:" num
     case "$num" in
     1)
       add_swap
@@ -155,26 +155,15 @@ main() {
       del_swap
       break
       ;;
+    3)
+      set_swappiness
+      break
+      ;;
     *)
       echo "输入错误，请重新输入"
       ;;
     esac
   done
-}
-
-check_swap() {
-  check_root
-  check_virt
-  if [ $VIRT = "openvz" ]; then
-    NEW="$((SWAP * 1024))"
-    TEMP="${NEW//?/ }"
-    OLD="${TEMP:1}0"
-    umount /proc/meminfo 2>/dev/null
-    sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo >/etc/fake_meminfo
-    mount --bind /etc/fake_meminfo /proc/meminfo
-  fi
-  sleep 1
-  exit 1
 }
 
 main
