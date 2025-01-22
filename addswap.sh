@@ -80,6 +80,37 @@ check_swappiness() {
   _blue "Current swappiness value is $swappiness."
   _blue "当前的swappiness值为 $swappiness。"
 }
+del_swap() {
+  if [ $VIRT = "openvz" ]; then
+    echo 'Start deleting SWAP space ......'
+    SWAP=0
+    NEW="$((SWAP * 1024))"
+    TEMP="${NEW//?/ }"
+    OLD="${TEMP:1}0"
+    umount /proc/meminfo 2>/dev/null
+    sed "/^Swap\(Total\|Free\):/s,$OLD,$NEW," /proc/meminfo >/etc/fake_meminfo
+    mount --bind /etc/fake_meminfo /proc/meminfo
+    delete_cron_entry "$0"
+    delete_cron_entry "$DEST_DIR/$SCRIPT -C"
+    echo -e "${Green}swap删除成功，并查看信息：${Font}"
+    free -m
+  else
+    #检查是否存在swapfile
+    grep -q "swapfile" /etc/fstab
+
+    #如果存在就将其移除
+    if [ $? -eq 0 ]; then
+      echo -e "${Green}swapfile已发现，正在将其移除...${Font}"
+      sed -i '/swapfile/d' /etc/fstab
+      echo "3" >/proc/sys/vm/drop_caches
+      swapoff -a
+      rm -f /swapfile
+      echo -e "${Green}swap已删除！${Font}"
+    else
+      echo -e "${Red}swapfile未发现，swap删除失败！${Font}"
+    fi
+  fi
+}
 
 add_swap() {
   _green "Please enter the desired amount of swap to add, recommended to be twice the size of the memory!"
