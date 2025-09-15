@@ -1,6 +1,5 @@
 #!/bin/bash
 # From https://github.com/spiritLHLS/addswap
-# Channel: https://t.me/vps_reviews
 # 2024.11.03
 
 utf8_locale=$(locale -a 2>/dev/null | grep -i -m 1 -E "UTF-8|utf8")
